@@ -27,6 +27,7 @@ func TestOkChainedHandlers(t *testing.T) {
 		next()
 	}
 	handler3 := func(req *HandlerRequest, res *HandlerResponse, next NextFunction) {
+		log.Println("[INFO] Third call changing the response")
 		res.StatusCode = 200
 	}
 	mainHandler := ComposeHandlers(handler1, handler2, handler3)
