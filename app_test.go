@@ -79,3 +79,36 @@ func TestChainWithThreeHandlersAndInTheSecondGetError(t *testing.T) {
 		}
 	})
 }
+
+func TestChainWithTheLastHandlerTryToCallANextHandler(t *testing.T) {
+	testName := "should return error in the second handler, because is trying to call another handler and does not exist"
+	type body struct {
+		value string
+	}
+	reqValue := HandlerRequest{
+		Body: body{value: "value"},
+	}
+	resValue := HandlerResponse{
+		StatusCode: 400,
+		Message:    "error trying to get some handler next the last handler",
+	}
+	handler1 := func(req *HandlerRequest, res *HandlerResponse, next NextFunction) {
+		log.Println("[INFO] First call doing something")
+		res.StatusCode = 200
+		next()
+	}
+	handler2 := func(req *HandlerRequest, res *HandlerResponse, next NextFunction) {
+		log.Println("[INFO] Second call doing something")
+		res.StatusCode = 201
+		next()
+	}
+	mainHandler := ComposeHandlers(handler1, handler2)
+	t.Run(testName, func(t *testing.T) {
+		log.Println("[INFO] TEST NAME:", testName)
+		ctx := context.Background()
+		resGotten := mainHandler.Handle(ctx, reqValue)
+		if !reflect.DeepEqual(resGotten, resValue) {
+			t.Errorf("The response gotten %+v, is not equal to response expected %+v", resGotten, resValue)
+		}
+	})
+}

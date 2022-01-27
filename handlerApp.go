@@ -32,7 +32,7 @@ func (ha *HandlerApp) nextFunction(req *HandlerRequest, res *HandlerResponse) Ne
 		if ha.currentIdx == ha.lengthHandlers-1 {
 			// Call the middleware error informing, that is the last handler
 			// And it has not returned a response
-			err := errors.New("[ERROR] Last handler")
+			err := errors.New("error trying to get some handler next the last handler")
 			ha.ErrorMiddleware(err, req, res)
 			return
 		}
